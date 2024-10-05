@@ -8,6 +8,10 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class SymfonyHookBundle extends Bundle
 {
+    public function __construct(private string $cacheDir)
+    {
+    }
+
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new HookProcessor());
@@ -16,7 +20,7 @@ class SymfonyHookBundle extends Bundle
 
     public function boot(): void
     {
-        $hookFile = $this->container->getParameter('kernel.cache_dir') . '/hook.php';
+        $hookFile = $this->cacheDir . '/hook.php';
 
         if (!file_exists($hookFile)) {
             return;

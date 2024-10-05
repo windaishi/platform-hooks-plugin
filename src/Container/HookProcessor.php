@@ -26,9 +26,10 @@ class HookProcessor implements CompilerPassInterface
             $methods = array_keys($class::getSubscribedEvents());
 
             foreach ($methods as $method) {
-                $class = explode('::', $method)[0];
+                $serviceId = explode('::', $method)[0];
+                $class = $container->getDefinition($serviceId)->getClass();
 
-                if (!class_exists($class)) {
+                if (!$class && !class_exists($class)) {
                     throw new \RuntimeException(\sprintf('Found invalid "%s" subscribe in subscriber "%s": Class does not exists', $method, $id));
                 }
 
@@ -49,6 +50,7 @@ class HookProcessor implements CompilerPassInterface
                 $definition->setClass($definition->getClass() . 'HookProxy');
 
                 $definition->addArgument(new Reference('event_dispatcher'));
+                $definition->addArgument($id);
             }
         }
     }
